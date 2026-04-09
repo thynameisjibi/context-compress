@@ -109,7 +109,7 @@ impl HybridCompressor {
 
     pub fn with_ollama(model: &str) -> Self {
         let abstractive = AbstractiveCompressor::ollama(model);
-        self.with_abstractive(abstractive)
+        Self::default().with_abstractive(abstractive)
     }
 }
 
