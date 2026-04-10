@@ -50,12 +50,12 @@ impl TokenCounter {
         &self.model
     }
 
-    pub fn encode(&self, text: &str) -> Vec<u32> {
+    pub fn encode(&self, text: &str) -> Vec<usize> {
         self.bpe.encode_ordinary(text)
     }
 
-    pub fn decode(&self, tokens: &[u32]) -> Result<String> {
-        self.bpe.decode(tokens.iter().map(|&t| t as usize).collect::<Vec<usize>>())
+    pub fn decode(&self, tokens: &[usize]) -> Result<String> {
+        self.bpe.decode(tokens.to_vec())
             .map_err(|e| CompressionError::TokenCounting(format!("Decode failed: {}", e)))
     }
 }
