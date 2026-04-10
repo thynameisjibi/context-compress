@@ -1,0 +1,49 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/core",
+    "crates/cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Jayvee Tolibas"]
+license = "MIT"
+repository = "https://github.com/thynameisjibi/context-compress"
+description = "Hybrid LLM Token Compression Tool"
+
+[workspace.dependencies]
+# Core dependencies
+tiktoken-rs = "0.5"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+anyhow = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+
+# Embeddings and similarity
+candle-core = "0.6"
+candle-transformers = "0.6"
+hf-hub = "0.3"
+tokenizers = "0.19"
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json"] }
+
+# Caching
+sled = "0.34"
+
+# CLI
+clap = { version = "4.0", features = ["derive"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Testing
+criterion = "0.5"
+proptest = "1.4"
+tempfile = "3.10"
+dirs = "5.0"
