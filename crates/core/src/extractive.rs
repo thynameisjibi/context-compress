@@ -37,7 +37,7 @@ impl ExtractiveCompressor {
         
         // If only one sentence is kept and it's similar to original, preserve original punctuation
         let compressed_text = if kept_sentences.len() == 1 && sentences.len() == 1 {
-            text.to_string()
+            text.to_owned()
         } else {
             kept_sentences.join(" ")
         };
