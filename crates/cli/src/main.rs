@@ -63,14 +63,33 @@ async fn main() -> Result<()> {
 async fn handle_command(command: Commands, cli: &Cli) -> Result<()> {
     match command {
         Commands::Compress { text } => {
-            let input = if let Some(t) = text { t } else { read_input(&cli.input)? };
-            let mut cli_with_input = cli.clone();
-            cli_with_input.input = None;
+            let input = if let Some(t) = text {
+                t
+            } else {
+                read_input(&cli.input)?
+            };
+            
+            // Compress the input directly
+            let mut cli_for_compress = Cli {
+                strategy: cli.strategy.clone(),
+                ratio: cli.ratio,
+                input: None,
+                output: cli.output.clone(),
+                verbose: cli.verbose,
+                audit: cli.audit,
+                config: cli.config.clone(),
+                log_level: cli.log_level.clone(),
+                command: None,
+            };
+            
+            // Write input to temp file
             use tempfile::NamedTempFile;
-            let mut temp = NamedTempFile::new()?;
-            temp.write_all(input.as_bytes())?;
-            cli_with_input.input = Some(temp.path().to_path_buf());
-            compress(&cli_with_input).await
+            use std::io::Write;
+            let mut temp_file = NamedTempFile::new()?;
+            temp_file.write_all(input.as_bytes())?;
+            cli_for_compress.input = Some(temp_file.path().to_path_buf());
+            
+            compress(&cli_for_compress).await
         }
         Commands::Count { text, model } => {
             use context_compress_core::TokenCounter;
