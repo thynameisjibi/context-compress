@@ -162,9 +162,9 @@ mod tests {
     use super::*;
     use crate::AuditTrail;
 
-    fn create_test_cache() -> SemanticCache {
+    fn create_test_cache(test_name: &str) -> SemanticCache {
         let config = CacheConfig {
-            path: format!("/tmp/test_cache_{}", std::process::id()),
+            path: format!("/tmp/test_cache_{}_{}", std::process::id(), test_name),
             ..Default::default()
         };
         SemanticCache::new(config).unwrap()
@@ -172,7 +172,7 @@ mod tests {
 
     #[test]
     fn test_cache_set_get() {
-        let cache = create_test_cache();
+        let cache = create_test_cache("set_get");
         let result = CompressionResult {
             text: "compressed".to_string(),
             original_tokens: 100,
@@ -188,7 +188,7 @@ mod tests {
 
     #[test]
     fn test_cache_miss() {
-        let cache = create_test_cache();
+        let cache = create_test_cache("miss");
         assert!(cache.get("nonexistent").unwrap().is_none());
     }
 }
