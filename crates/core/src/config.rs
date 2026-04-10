@@ -5,23 +5,12 @@ use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::fs;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Config {
     pub compression: CompressionConfig,
     pub llm: LlmConfig,
     pub cache: CacheConfig,
     pub logging: LoggingConfig,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            compression: CompressionConfig::default(),
-            llm: LlmConfig::default(),
-            cache: CacheConfig::default(),
-            logging: LoggingConfig::default(),
-        }
-    }
 }
 
 impl Config {

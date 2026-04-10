@@ -49,8 +49,10 @@ impl ExtractiveCompressor {
             1.0
         };
 
-        let mut audit = AuditTrail::default();
-        audit.strategy = "extractive".to_owned();
+        let audit = AuditTrail {
+            strategy: "extractive".to_owned(),
+            ..Default::default()
+        };
         for (i, sentence) in sentences.iter().enumerate() {
             if removed_indices.contains(&i) {
                 audit.removed.push(sentence.clone());

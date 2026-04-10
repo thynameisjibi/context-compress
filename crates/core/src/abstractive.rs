@@ -62,8 +62,10 @@ impl AbstractiveCompressor {
             1.0
         };
 
-        let mut audit = AuditTrail::default();
-        audit.strategy = "abstractive".to_string();
+        let mut audit = AuditTrail {
+            strategy: "abstractive".to_owned(),
+            ..Default::default()
+        };
         audit.modified.push(format!("Original: {} chars", text.len()));
         audit.modified.push(format!("Compressed: {} chars", compressed_text.len()));
 
