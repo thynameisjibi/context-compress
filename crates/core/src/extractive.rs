@@ -34,7 +34,13 @@ impl ExtractiveCompressor {
 
         let sentences = self.split_into_sentences(text);
         let (kept_sentences, removed_indices) = self.select_unique_sentences(&sentences);
-        let compressed_text = kept_sentences.join(" ");
+        
+        // If only one sentence is kept and it's similar to original, preserve original punctuation
+        let compressed_text = if kept_sentences.len() == 1 && sentences.len() == 1 {
+            text.to_string()
+        } else {
+            kept_sentences.join(" ")
+        };
         let original_tokens = text.len() / 4;
         let compressed_tokens = compressed_text.len() / 4;
         let compression_ratio = if original_tokens > 0 {
