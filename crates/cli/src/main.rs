@@ -2,7 +2,7 @@
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use context_compress_core::{AbstractiveCompressor, CompressionStrategy, HybridCompressor};
+use context_compress_core::{AbstractiveCompressor, CompressionStrategy, Config, HybridCompressor};
 use std::io::{self, Read, Write};
 use std::path::PathBuf;
 use tracing::info;
@@ -138,6 +138,9 @@ async fn compress(cli: &Cli) -> Result<()> {
         anyhow::bail!("No input provided");
     }
 
+    let runtime_config = load_runtime_config()?;
+    let abstractive = AbstractiveCompressor::from_app_config(&runtime_config.llm, cli.ratio);
+
     let compressor = match cli.strategy {
         Strategy::Extractive => {
             HybridCompressor::new(context_compress_core::hybrid::HybridConfig {
@@ -150,11 +153,9 @@ async fn compress(cli: &Cli) -> Result<()> {
                 strategy: CompressionStrategy::Abstractive,
                 ..Default::default()
             })
-            .with_abstractive(AbstractiveCompressor::default())
+            .with_abstractive(abstractive.clone())
         }
-        Strategy::Hybrid => {
-            HybridCompressor::default().with_abstractive(AbstractiveCompressor::default())
-        }
+        Strategy::Hybrid => HybridCompressor::default().with_abstractive(abstractive),
     };
 
     let result = compressor.compress(&input).await?;
@@ -180,6 +181,15 @@ async fn compress(cli: &Cli) -> Result<()> {
     }
 
     Ok(())
+}
+
+fn load_runtime_config() -> Result<Config> {
+    let path = Config::default_path();
+    if path.exists() {
+        Ok(Config::load(&path)?)
+    } else {
+        Ok(Config::default())
+    }
 }
 
 fn read_input(path: &Option<PathBuf>) -> Result<String> {
