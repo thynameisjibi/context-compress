@@ -77,7 +77,6 @@ async fn handle_command(command: Commands, cli: &Cli) -> Result<()> {
                 output: cli.output.clone(),
                 verbose: cli.verbose,
                 audit: cli.audit,
-                config: cli.config.clone(),
                 log_level: cli.log_level.clone(),
                 command: None,
             };
