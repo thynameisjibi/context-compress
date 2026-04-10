@@ -114,12 +114,15 @@ impl SemanticCache {
         let mut total_size = 0;
         let mut expired_count = 0;
         
-        for (key, value) in self.db.iter().flatten() {
-            count += 1;
-            total_size += key.len() + value.len();
-            if let Ok(entry) = serde_json::from_slice::<CacheEntry>(&value) {
-                if entry.is_expired() {
-                    expired_count += 1;
+        #[allow(clippy::manual_flatten)]
+        for result in self.db.iter() {
+            if let Ok((key, value)) = result {
+                count += 1;
+                total_size += key.len() + value.len();
+                if let Ok(entry) = serde_json::from_slice::<CacheEntry>(&value) {
+                    if entry.is_expired() {
+                        expired_count += 1;
+                    }
                 }
             }
         }
