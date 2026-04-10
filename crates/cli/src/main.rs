@@ -8,7 +8,7 @@ use std::path::PathBuf;
 use tracing::info;
 use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
-#[derive(Parser)]
+#[derive(Parser, Clone)]
 #[command(name = "cc")]
 #[command(author = "Jayvee Tolibas")]
 #[command(version = "0.1.0")]
@@ -63,39 +63,23 @@ async fn main() -> Result<()> {
 async fn handle_command(command: Commands, cli: &Cli) -> Result<()> {
     match command {
         Commands::Compress { text } => {
-            // Clone all needed fields FIRST before any moves
-            let strategy = cli.strategy.clone();
-            let ratio = cli.ratio;
-            let output = cli.output.clone();
-            let verbose = cli.verbose;
-            let audit = cli.audit;
-            let log_level = cli.log_level.clone();
-            let input_arg = cli.input.clone();
+            // Clone entire Cli, then modify
+            let mut cli_for_compress = cli.clone();
+            cli_for_compress.command = None;
             
-            // Now read input (this won't cause partial move)
+            // Read input
             let input = if let Some(t) = text {
                 t
             } else {
-                read_input(&input_arg)?
+                read_input(&cli.input)?
             };
             
-            // Write input to temp file
+            // Write input to temp file and update input field
             use tempfile::NamedTempFile;
             use std::io::Write;
             let mut temp_file = NamedTempFile::new()?;
             temp_file.write_all(input.as_bytes())?;
-            
-            // Create new Cli for compress
-            let cli_for_compress = Cli {
-                strategy,
-                ratio,
-                input: Some(temp_file.path().to_path_buf()),
-                output,
-                verbose,
-                audit,
-                log_level,
-                command: None,
-            };
+            cli_for_compress.input = Some(temp_file.path().to_path_buf());
             
             compress(&cli_for_compress).await
         }
