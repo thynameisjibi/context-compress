@@ -63,22 +63,20 @@ async fn main() -> Result<()> {
 async fn handle_command(command: Commands, cli: &Cli) -> Result<()> {
     match command {
         Commands::Compress { text } => {
+            // Clone all needed fields FIRST before any moves
+            let strategy = cli.strategy.clone();
+            let ratio = cli.ratio;
+            let output = cli.output.clone();
+            let verbose = cli.verbose;
+            let audit = cli.audit;
+            let log_level = cli.log_level.clone();
+            let input_arg = cli.input.clone();
+            
+            // Now read input (this won't cause partial move)
             let input = if let Some(t) = text {
                 t
             } else {
-                read_input(&cli.input)?
-            };
-            
-            // Compress the input directly
-            let mut cli_for_compress = Cli {
-                strategy: cli.strategy.clone(),
-                ratio: cli.ratio,
-                input: None,
-                output: cli.output.clone(),
-                verbose: cli.verbose,
-                audit: cli.audit,
-                log_level: cli.log_level.clone(),
-                command: None,
+                read_input(&input_arg)?
             };
             
             // Write input to temp file
@@ -86,7 +84,18 @@ async fn handle_command(command: Commands, cli: &Cli) -> Result<()> {
             use std::io::Write;
             let mut temp_file = NamedTempFile::new()?;
             temp_file.write_all(input.as_bytes())?;
-            cli_for_compress.input = Some(temp_file.path().to_path_buf());
+            
+            // Create new Cli for compress
+            let cli_for_compress = Cli {
+                strategy,
+                ratio,
+                input: Some(temp_file.path().to_path_buf()),
+                output,
+                verbose,
+                audit,
+                log_level,
+                command: None,
+            };
             
             compress(&cli_for_compress).await
         }
