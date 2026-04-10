@@ -239,9 +239,20 @@ OPTIONS:
 
 ## 🔧 Configuration
 
-Create `~/.config/context-compress/config.json`:
+### Config File Location
 
-```json
+<details>
+<summary><strong>🍎 macOS / 🐧 Linux</strong></summary>
+
+```bash
+# Config file location:
+~/.config/context-compress/config.json
+
+# Create directory
+mkdir -p ~/.config/context-compress
+
+# Create config file
+cat > ~/.config/context-compress/config.json <<EOF
 {
   "compression": {
     "strategy": "hybrid",
@@ -268,11 +279,63 @@ Create `~/.config/context-compress/config.json`:
     "format": "pretty"
   }
 }
+EOF
 ```
+
+</details>
+
+<details>
+<summary><strong>🪟 Windows</strong></summary>
+
+```powershell
+# Config file location:
+%APPDATA%\context-compress\config.json
+# Or: C:\Users\<YourUsername>\AppData\Roaming\context-compress\config.json
+
+# Create directory
+New-Item -ItemType Directory -Force -Path "$env:APPDATA\context-compress"
+
+# Create config file (using PowerShell)
+$config = @'
+{
+  "compression": {
+    "strategy": "hybrid",
+    "target_ratio": 0.5,
+    "min_ratio": 0.3,
+    "max_passes": 3,
+    "multi_pass": true,
+    "confidence_threshold": 0.7
+  },
+  "llm": {
+    "provider": "ollama",
+    "model": "llama2",
+    "max_tokens": 1024,
+    "temperature": 0.3
+  },
+  "cache": {
+    "enabled": true,
+    "ttl_seconds": 3600,
+    "max_size_bytes": 104857600
+  },
+  "logging": {
+    "level": "info",
+    "stdout": true,
+    "format": "pretty"
+  }
+}
+'@
+
+$config | Out-File -FilePath "$env:APPDATA\context-compress\config.json" -Encoding utf8
+```
+
+**WSL2:** Use the Linux instructions above (config will be in `~/.config/context-compress/config.json`)
+
+</details>
 
 ### LLM Provider Setup
 
-#### Ollama (Local - Free)
+<details>
+<summary><strong>🍎 macOS / 🐧 Linux - Ollama (Local - Free)</strong></summary>
 
 ```bash
 # Install Ollama
@@ -292,11 +355,41 @@ cat > ~/.config/context-compress/config.json <<EOF
 EOF
 ```
 
-#### OpenAI
+</details>
+
+<details>
+<summary><strong>🪟 Windows - Ollama (Local - Free)</strong></summary>
+
+```powershell
+# 1. Download and install Ollama from:
+# https://ollama.ai/download
+
+# 2. Pull a model (in PowerShell or Command Prompt)
+ollama pull llama2
+
+# 3. Configure
+# Create config file at: %APPDATA%\context-compress\config.json
+$config = @'
+{
+  "llm": {
+    "provider": "ollama",
+    "model": "llama2"
+  }
+}
+'@
+$config | Out-File -FilePath "$env:APPDATA\context-compress\config.json" -Encoding utf8
+```
+
+</details>
+
+<details>
+<summary><strong>🍎 macOS / 🐧 Linux - OpenAI</strong></summary>
 
 ```bash
+# Set API key (add to ~/.zshrc or ~/.bashrc for persistence)
 export OPENAI_API_KEY="sk-..."
 
+# Configure
 cat > ~/.config/context-compress/config.json <<EOF
 {
   "llm": {
@@ -307,11 +400,37 @@ cat > ~/.config/context-compress/config.json <<EOF
 EOF
 ```
 
-#### Anthropic
+</details>
+
+<details>
+<summary><strong>🪟 Windows - OpenAI</strong></summary>
+
+```powershell
+# 1. Set API key (permanently)
+[System.Environment]::SetEnvironmentVariable('OPENAI_API_KEY', 'sk-...', 'User')
+
+# 2. Configure
+$config = @'
+{
+  "llm": {
+    "provider": "openai",
+    "model": "gpt-3.5-turbo"
+  }
+}
+'@
+$config | Out-File -FilePath "$env:APPDATA\context-compress\config.json" -Encoding utf8
+```
+
+</details>
+
+<details>
+<summary><strong>🍎 macOS / 🐧 Linux - Anthropic</strong></summary>
 
 ```bash
+# Set API key (add to ~/.zshrc or ~/.bashrc for persistence)
 export ANTHROPIC_API_KEY="sk-ant-..."
 
+# Configure
 cat > ~/.config/context-compress/config.json <<EOF
 {
   "llm": {
@@ -321,6 +440,29 @@ cat > ~/.config/context-compress/config.json <<EOF
 }
 EOF
 ```
+
+</details>
+
+<details>
+<summary><strong>🪟 Windows - Anthropic</strong></summary>
+
+```powershell
+# 1. Set API key (permanently)
+[System.Environment]::SetEnvironmentVariable('ANTHROPIC_API_KEY', 'sk-ant-...', 'User')
+
+# 2. Configure
+$config = @'
+{
+  "llm": {
+    "provider": "anthropic",
+    "model": "claude-3-sonnet-20240229"
+  }
+}
+'@
+$config | Out-File -FilePath "$env:APPDATA\context-compress\config.json" -Encoding utf8
+```
+
+</details>
 
 ---
 
