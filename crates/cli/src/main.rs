@@ -32,7 +32,7 @@ struct Cli {
     command: Option<Commands>,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Clone)]
 enum Commands {
     Compress { text: Option<String> },
     Count { text: Option<String>, #[arg(short = 'm', long, default_value = "gpt-4")] model: String },
