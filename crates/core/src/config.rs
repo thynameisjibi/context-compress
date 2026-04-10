@@ -97,20 +97,15 @@ impl Default for LlmConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum LlmProvider {
+    #[default]
     Ollama,
     OpenAi,
     Anthropic,
     LmStudio,
     Custom,
-}
-
-impl Default for LlmProvider {
-    fn default() -> Self {
-        Self::Ollama
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
