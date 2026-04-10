@@ -89,7 +89,7 @@ impl ExtractiveCompressor {
         let mut removed_indices = HashSet::new();
 
         for (i, sentence) in sentences.iter().enumerate() {
-            let is_redundant = kept.iter().any(|kept_sentence| {
+            let is_redundant = kept.iter().any(|kept_sentence: &String| {
                 let similarity = self.calculate_similarity(sentence, kept_sentence);
                 similarity >= self.similarity_threshold
             });
