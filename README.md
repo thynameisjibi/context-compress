@@ -57,20 +57,97 @@ ContextCompress is a **high-performance token compression tool** that combines e
 
 ### Installation
 
+<details>
+<summary><strong>🍎 macOS</strong></summary>
+
 ```bash
-# Clone and build
+# 1. Install Rust (if not already installed)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 2. Clone and build
 git clone https://github.com/thynameisjibi/context-compress.git
 cd context-compress
 cargo build --release
 
-# Install system-wide
+# 3. Install system-wide
 cargo install --path .
 
 # Or copy to PATH manually
 cp target/release/cc ~/.cargo/bin/
+
+# 4. Verify installation
+cc --help
 ```
 
-### First Compression
+</details>
+
+<details>
+<summary><strong>🐧 Linux</strong></summary>
+
+```bash
+# 1. Install Rust (if not already installed)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 2. Install dependencies (Ubuntu/Debian)
+sudo apt update
+sudo apt install build-essential pkg-config libssl-dev
+
+# For Fedora/RHEL:
+sudo dnf install gcc gcc-c++ make openssl-devel
+
+# 3. Clone and build
+git clone https://github.com/thynameisjibi/context-compress.git
+cd context-compress
+cargo build --release
+
+# 4. Install system-wide
+cargo install --path .
+
+# Or copy to PATH manually
+sudo cp target/release/cc /usr/local/bin/
+
+# 5. Verify installation
+cc --help
+```
+
+</details>
+
+<details>
+<summary><strong>🪟 Windows</strong></summary>
+
+```powershell
+# 1. Install Rust
+# Download and run: https://win.rustup.rs/x86_64
+# Or install via winget:
+winget install Rustlang.Rustup
+
+# 2. Install Git (if not already installed)
+winget install Git.Git
+
+# 3. Clone and build
+git clone https://github.com/thynameisjibi/context-compress.git
+cd context-compress
+cargo build --release
+
+# 4. The binary will be at: target\release\cc.exe
+
+# 5. Add to PATH (optional)
+# Copy to a folder in your PATH, or add target\release to PATH
+# Or install via cargo
+cargo install --path .
+
+# 6. Verify installation (in new terminal)
+cc --help
+```
+
+**Windows Subsystem for Linux (WSL2):**
+```bash
+# If using WSL2, follow the Linux instructions above
+```
+
+</details>
+
+### Quick Test
 
 ```bash
 # Compress text from stdin
