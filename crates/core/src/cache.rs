@@ -16,9 +16,13 @@ pub struct CacheEntry {
 
 impl CacheEntry {
     pub fn new(query: String, result: CompressionResult, ttl: Duration) -> Self {
-        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
         Self {
-            query, result,
+            query,
+            result,
             created_at: now,
             expires_at: now + ttl.as_secs(),
             access_count: 0,
@@ -26,7 +30,10 @@ impl CacheEntry {
     }
 
     pub fn is_expired(&self) -> bool {
-        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
         now > self.expires_at
     }
 
@@ -68,17 +75,20 @@ impl SemanticCache {
 
     pub fn get(&self, query: &str) -> Result<Option<CompressionResult>> {
         let key = self.compute_key(query);
-        if let Some(entry_bytes) = self.db.get(&key)
+        if let Some(entry_bytes) = self
+            .db
+            .get(&key)
             .map_err(|e| crate::CompressionError::Cache(format!("Cache get failed: {}", e)))?
         {
-            let mut entry: CacheEntry = serde_json::from_slice(&entry_bytes)
-                .map_err(|e| crate::CompressionError::Cache(format!("Deserialize failed: {}", e)))?;
-            
+            let mut entry: CacheEntry = serde_json::from_slice(&entry_bytes).map_err(|e| {
+                crate::CompressionError::Cache(format!("Deserialize failed: {}", e))
+            })?;
+
             if entry.is_expired() {
                 self.remove(query)?;
                 return Ok(None);
             }
-            
+
             entry.touch();
             return Ok(Some(entry.result));
         }
@@ -91,20 +101,23 @@ impl SemanticCache {
         let entry = CacheEntry::new(query.to_string(), result, ttl);
         let entry_bytes = serde_json::to_vec(&entry)
             .map_err(|e| crate::CompressionError::Cache(format!("Serialize failed: {}", e)))?;
-        self.db.insert(&key, entry_bytes)
+        self.db
+            .insert(&key, entry_bytes)
             .map_err(|e| crate::CompressionError::Cache(format!("Insert failed: {}", e)))?;
         Ok(())
     }
 
     pub fn remove(&self, query: &str) -> Result<()> {
         let key = self.compute_key(query);
-        self.db.remove(&key)
+        self.db
+            .remove(&key)
             .map_err(|e| crate::CompressionError::Cache(format!("Remove failed: {}", e)))?;
         Ok(())
     }
 
     pub fn clear(&self) -> Result<()> {
-        self.db.clear()
+        self.db
+            .clear()
             .map_err(|e| crate::CompressionError::Cache(format!("Clear failed: {}", e)))?;
         Ok(())
     }
@@ -113,7 +126,7 @@ impl SemanticCache {
         let mut count = 0;
         let mut total_size = 0;
         let mut expired_count = 0;
-        
+
         #[allow(clippy::manual_flatten)]
         for result in self.db.iter() {
             if let Ok((key, value)) = result {
@@ -126,7 +139,7 @@ impl SemanticCache {
                 }
             }
         }
-        
+
         Ok(CacheStats {
             entry_count: count,
             total_size_bytes: total_size,
@@ -140,11 +153,14 @@ impl SemanticCache {
         use std::hash::{Hash, Hasher};
         let mut hasher = DefaultHasher::new();
         query.hash(&mut hasher);
-        format!("cache:{:016x}", hasher.finish()).into_bytes().into()
+        format!("cache:{:016x}", hasher.finish())
+            .into_bytes()
+            .into()
     }
 
     pub fn flush(&self) -> Result<()> {
-        self.db.flush()
+        self.db
+            .flush()
             .map_err(|e| crate::CompressionError::Cache(format!("Flush failed: {}", e)))?;
         Ok(())
     }

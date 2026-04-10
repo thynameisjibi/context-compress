@@ -1,6 +1,6 @@
 //! Abstractive compression module
 
-use crate::{CompressionResult, AuditTrail, Result};
+use crate::{AuditTrail, CompressionResult, Result};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -38,7 +38,10 @@ impl Default for AbstractiveCompressor {
 
 impl AbstractiveCompressor {
     pub fn new(config: LlmConfig, target_ratio: f64) -> Self {
-        Self { config, target_ratio: target_ratio.clamp(0.0, 1.0) }
+        Self {
+            config,
+            target_ratio: target_ratio.clamp(0.0, 1.0),
+        }
     }
 
     pub async fn compress(&self, text: &str) -> Result<CompressionResult> {

@@ -1,6 +1,6 @@
 //! Extractive compression module
 
-use crate::{CompressionResult, AuditTrail, Result};
+use crate::{AuditTrail, CompressionResult, Result};
 use std::collections::HashSet;
 
 #[derive(Debug, Clone)]
@@ -17,7 +17,10 @@ impl Default for ExtractiveCompressor {
 
 impl ExtractiveCompressor {
     pub fn new(similarity_threshold: f64, min_sentence_length: usize) -> Self {
-        Self { similarity_threshold, min_sentence_length }
+        Self {
+            similarity_threshold,
+            min_sentence_length,
+        }
     }
 
     pub fn compress(&self, text: &str) -> Result<CompressionResult> {
@@ -34,7 +37,7 @@ impl ExtractiveCompressor {
 
         let sentences = self.split_into_sentences(text);
         let (kept_sentences, removed_indices) = self.select_unique_sentences(&sentences);
-        
+
         // If only one sentence is kept and it's similar to original, preserve original punctuation
         let compressed_text = if kept_sentences.len() == 1 && sentences.len() == 1 {
             text.to_owned()
@@ -109,7 +112,11 @@ impl ExtractiveCompressor {
         let words2: HashSet<&str> = text2.split_whitespace().collect();
         let intersection = words1.intersection(&words2).count();
         let union = words1.union(&words2).count();
-        if union == 0 { 0.0 } else { intersection as f64 / union as f64 }
+        if union == 0 {
+            0.0
+        } else {
+            intersection as f64 / union as f64
+        }
     }
 }
 

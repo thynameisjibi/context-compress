@@ -55,7 +55,8 @@ impl TokenCounter {
     }
 
     pub fn decode(&self, tokens: &[usize]) -> Result<String> {
-        self.bpe.decode(tokens.to_vec())
+        self.bpe
+            .decode(tokens.to_vec())
             .map_err(|e| CompressionError::TokenCounting(format!("Decode failed: {}", e)))
     }
 }
@@ -70,13 +71,25 @@ pub struct Message {
 
 impl Message {
     pub fn system(content: &str) -> Self {
-        Self { role: "system".to_string(), content: content.to_string(), name: None }
+        Self {
+            role: "system".to_string(),
+            content: content.to_string(),
+            name: None,
+        }
     }
     pub fn user(content: &str) -> Self {
-        Self { role: "user".to_string(), content: content.to_string(), name: None }
+        Self {
+            role: "user".to_string(),
+            content: content.to_string(),
+            name: None,
+        }
     }
     pub fn assistant(content: &str) -> Self {
-        Self { role: "assistant".to_string(), content: content.to_string(), name: None }
+        Self {
+            role: "assistant".to_string(),
+            content: content.to_string(),
+            name: None,
+        }
     }
 }
 

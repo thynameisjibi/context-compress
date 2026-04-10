@@ -1,6 +1,9 @@
 //! Hybrid compression engine
 
-use crate::{CompressionResult, AuditTrail, Result, ExtractiveCompressor, AbstractiveCompressor, CompressionStrategy};
+use crate::{
+    AbstractiveCompressor, AuditTrail, CompressionResult, CompressionStrategy,
+    ExtractiveCompressor, Result,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -79,7 +82,7 @@ impl HybridCompressor {
 
     async fn compress_hybrid(&self, text: &str) -> Result<CompressionResult> {
         let extractive_result = self.extractive.compress(text)?;
-        
+
         if extractive_result.compression_ratio <= self.config.min_compression_ratio {
             return Ok(extractive_result);
         }
@@ -87,7 +90,9 @@ impl HybridCompressor {
         if let Some(ref abstractive) = self.abstractive {
             let abstractive_result = abstractive.compress(&extractive_result.text).await?;
             let mut combined_audit = extractive_result.audit.clone();
-            combined_audit.modified.extend(abstractive_result.audit.modified);
+            combined_audit
+                .modified
+                .extend(abstractive_result.audit.modified);
             combined_audit.strategy = "hybrid".to_string();
 
             return Ok(CompressionResult {

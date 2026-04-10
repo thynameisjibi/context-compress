@@ -2,8 +2,8 @@
 
 use crate::{CompressionStrategy, Result};
 use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
 use std::fs;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Config {
@@ -15,10 +15,12 @@ pub struct Config {
 
 impl Config {
     pub fn load(path: &Path) -> Result<Self> {
-        let content = fs::read_to_string(path)
-            .map_err(|e| crate::CompressionError::Config(format!("Failed to read config: {}", e)))?;
-        let config: Config = serde_json::from_str(&content)
-            .map_err(|e| crate::CompressionError::Config(format!("Failed to parse config: {}", e)))?;
+        let content = fs::read_to_string(path).map_err(|e| {
+            crate::CompressionError::Config(format!("Failed to read config: {}", e))
+        })?;
+        let config: Config = serde_json::from_str(&content).map_err(|e| {
+            crate::CompressionError::Config(format!("Failed to parse config: {}", e))
+        })?;
         config.validate()?;
         Ok(config)
     }
@@ -28,8 +30,9 @@ impl Config {
         let content = serde_json::to_string_pretty(self)
             .map_err(|e| crate::CompressionError::Config(format!("Failed to serialize: {}", e)))?;
         if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent)
-                .map_err(|e| crate::CompressionError::Config(format!("Failed to create dir: {}", e)))?;
+            fs::create_dir_all(parent).map_err(|e| {
+                crate::CompressionError::Config(format!("Failed to create dir: {}", e))
+            })?;
         }
         fs::write(path, content)
             .map_err(|e| crate::CompressionError::Config(format!("Failed to write: {}", e)))?;
@@ -38,7 +41,9 @@ impl Config {
 
     pub fn validate(&self) -> Result<()> {
         if self.compression.target_ratio < 0.0 || self.compression.target_ratio > 1.0 {
-            return Err(crate::CompressionError::Config("target_ratio must be 0.0-1.0".to_string()));
+            return Err(crate::CompressionError::Config(
+                "target_ratio must be 0.0-1.0".to_string(),
+            ));
         }
         Ok(())
     }

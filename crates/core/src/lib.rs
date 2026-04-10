@@ -1,22 +1,22 @@
 //! ContextCompress Core Library
-//! 
+//!
 //! This crate provides the core compression logic for the ContextCompress tool,
 //! including token counting, extractive compression, abstractive compression,
 //! and hybrid compression strategies.
 
-pub mod token_counter;
-pub mod extractive;
 pub mod abstractive;
-pub mod hybrid;
 pub mod cache;
 pub mod config;
+pub mod extractive;
+pub mod hybrid;
+pub mod token_counter;
 
-pub use token_counter::TokenCounter;
-pub use extractive::ExtractiveCompressor;
 pub use abstractive::AbstractiveCompressor;
-pub use hybrid::HybridCompressor;
 pub use cache::SemanticCache;
 pub use config::Config;
+pub use extractive::ExtractiveCompressor;
+pub use hybrid::HybridCompressor;
+pub use token_counter::TokenCounter;
 
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -83,16 +83,16 @@ pub enum CompressionStrategy {
 pub enum CompressionError {
     #[error("Token counting failed: {0}")]
     TokenCounting(String),
-    
+
     #[error("LLM API error: {0}")]
     LlmApi(String),
-    
+
     #[error("Cache error: {0}")]
     Cache(String),
-    
+
     #[error("Configuration error: {0}")]
     Config(String),
-    
+
     #[error("Invalid input: {0}")]
     InvalidInput(String),
 }

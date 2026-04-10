@@ -34,8 +34,14 @@ struct Cli {
 
 #[derive(Subcommand, Clone)]
 enum Commands {
-    Compress { text: Option<String> },
-    Count { text: Option<String>, #[arg(short = 'm', long, default_value = "gpt-4")] model: String },
+    Compress {
+        text: Option<String>,
+    },
+    Count {
+        text: Option<String>,
+        #[arg(short = 'm', long, default_value = "gpt-4")]
+        model: String,
+    },
     Cache,
     Init,
 }
@@ -50,8 +56,12 @@ enum Strategy {
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
-    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(&cli.log_level));
-    tracing_subscriber::registry().with(fmt::layer()).with(filter).init();
+    let filter =
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(&cli.log_level));
+    tracing_subscriber::registry()
+        .with(fmt::layer())
+        .with(filter)
+        .init();
     info!("ContextCompress v{}", env!("CARGO_PKG_VERSION"));
 
     if let Some(command) = cli.command.clone() {
@@ -66,26 +76,30 @@ async fn handle_command(command: Commands, cli: &Cli) -> Result<()> {
             // Clone entire Cli, then modify
             let mut cli_for_compress = cli.clone();
             cli_for_compress.command = None;
-            
+
             // Read input
             let input = if let Some(t) = text {
                 t
             } else {
                 read_input(&cli.input)?
             };
-            
+
             // Write input to temp file and update input field
-            use tempfile::NamedTempFile;
             use std::io::Write;
+            use tempfile::NamedTempFile;
             let mut temp_file = NamedTempFile::new()?;
             temp_file.write_all(input.as_bytes())?;
             cli_for_compress.input = Some(temp_file.path().to_path_buf());
-            
+
             compress(&cli_for_compress).await
         }
         Commands::Count { text, model } => {
             use context_compress_core::TokenCounter;
-            let input = if let Some(t) = text { t } else { read_input(&cli.input)? };
+            let input = if let Some(t) = text {
+                t
+            } else {
+                read_input(&cli.input)?
+            };
             let counter = TokenCounter::new(&model);
             let count = counter.count(&input)?;
             println!("Token count ({}): {}", model, count);
@@ -98,7 +112,10 @@ async fn handle_command(command: Commands, cli: &Cli) -> Result<()> {
             let stats = cache.stats()?;
             println!("Cache Statistics:");
             println!("  Entries: {}", stats.entry_count);
-            println!("  Size: {:.2} MB", stats.total_size_bytes as f64 / 1024.0 / 1024.0);
+            println!(
+                "  Size: {:.2} MB",
+                stats.total_size_bytes as f64 / 1024.0 / 1024.0
+            );
             Ok(())
         }
         Commands::Init => {
@@ -132,7 +149,8 @@ async fn compress(cli: &Cli) -> Result<()> {
             HybridCompressor::new(context_compress_core::hybrid::HybridConfig {
                 strategy: CompressionStrategy::Abstractive,
                 ..Default::default()
-            }).with_abstractive(AbstractiveCompressor::default())
+            })
+            .with_abstractive(AbstractiveCompressor::default())
         }
         Strategy::Hybrid => {
             HybridCompressor::default().with_abstractive(AbstractiveCompressor::default())
@@ -153,7 +171,11 @@ async fn compress(cli: &Cli) -> Result<()> {
         eprintln!("\nCompression Statistics:");
         eprintln!("  Original tokens: {}", result.original_tokens);
         eprintln!("  Compressed tokens: {}", result.compressed_tokens);
-        eprintln!("  Reduction: {} tokens ({:.1}%)", result.token_reduction(), result.reduction_percentage());
+        eprintln!(
+            "  Reduction: {} tokens ({:.1}%)",
+            result.token_reduction(),
+            result.reduction_percentage()
+        );
         eprintln!("  Compression ratio: {:.2}", result.compression_ratio);
     }
 
