@@ -54,7 +54,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::registry().with(fmt::layer()).with(filter).init();
     info!("ContextCompress v{}", env!("CARGO_PKG_VERSION"));
 
-    if let Some(command) = cli.command {
+    if let Some(command) = cli.command.clone() {
         return handle_command(command, &cli).await;
     }
     compress(&cli).await
