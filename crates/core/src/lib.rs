@@ -66,7 +66,7 @@ pub struct AuditTrail {
 }
 
 /// Configuration for compression behavior
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum CompressionStrategy {
     /// Only remove redundant content
     Extractive,
