@@ -62,12 +62,15 @@ impl AbstractiveCompressor {
             1.0
         };
 
-        let mut audit = AuditTrail {
+        let mut modified = Vec::new();
+        modified.push(format!("Original: {} chars", text.len()));
+        modified.push(format!("Compressed: {} chars", compressed_text.len()));
+
+        let audit = AuditTrail {
             strategy: "abstractive".to_owned(),
+            modified,
             ..Default::default()
         };
-        audit.modified.push(format!("Original: {} chars", text.len()));
-        audit.modified.push(format!("Compressed: {} chars", compressed_text.len()));
 
         Ok(CompressionResult {
             text: compressed_text,

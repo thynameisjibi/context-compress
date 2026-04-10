@@ -49,17 +49,22 @@ impl ExtractiveCompressor {
             1.0
         };
 
-        let audit = AuditTrail {
-            strategy: "extractive".to_owned(),
-            ..Default::default()
-        };
+        let mut removed = Vec::new();
+        let mut kept = Vec::new();
         for (i, sentence) in sentences.iter().enumerate() {
             if removed_indices.contains(&i) {
-                audit.removed.push(sentence.clone());
+                removed.push(sentence.clone());
             } else {
-                audit.kept.push(sentence.clone());
+                kept.push(sentence.clone());
             }
         }
+
+        let audit = AuditTrail {
+            strategy: "extractive".to_owned(),
+            removed,
+            kept,
+            ..Default::default()
+        };
 
         Ok(CompressionResult {
             text: compressed_text,
