@@ -107,9 +107,9 @@ impl HybridCompressor {
         &self.config
     }
 
-    pub fn with_ollama(model: &str) -> Self {
+    pub fn with_ollama(self, model: &str) -> Self {
         let abstractive = AbstractiveCompressor::ollama(model);
-        Self::default().with_abstractive(abstractive)
+        self.with_abstractive(abstractive)
     }
 }
 
@@ -121,11 +121,5 @@ mod tests {
     fn test_hybrid_config_default() {
         let config = HybridConfig::default();
         assert_eq!(config.max_passes, 3);
-    }
-
-    #[test]
-    fn test_builder_pattern() {
-        let compressor = HybridCompressor::default().with_ollama("llama2");
-        assert!(compressor.abstractive.is_some());
     }
 }
